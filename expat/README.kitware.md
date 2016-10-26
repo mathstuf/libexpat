@@ -8,3 +8,4 @@ process.
 
   * Add attributes to pass commit checks within VTK.
   * Add CMake code to integrate with VTK's module system.
+  * Mangle all exported symbols to have a `vtkexpat_` prefix.

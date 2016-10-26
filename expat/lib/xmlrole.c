@@ -40,6 +40,8 @@
 #endif
 #endif /* ndef _WIN32 */
 
+#include "vtk_expat_mangle.h"
+
 #include "expat_external.h"
 #include "internal.h"
 #include "xmlrole.h"
