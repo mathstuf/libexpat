@@ -7,3 +7,4 @@ symbols to avoid conflicts with other copies of the library within a single
 process.
 
   * Add attributes to pass commit checks within VTK.
+  * Add CMake code to integrate with VTK's module system.

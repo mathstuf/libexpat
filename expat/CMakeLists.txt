@@ -1,6 +1,7 @@
 # This file is copyrighted under the BSD-license for buildsystem files of KDE
 # copyright 2010, Patrick Spendrin <ps_ml@gmx.de>
 
+if (FALSE) # XXX(kitware): Force build settings.
 project(expat)
 
 cmake_minimum_required(VERSION 2.6)
@@ -33,6 +34,15 @@ option(BUILD_shared "build a shared expat library" ON)
 option(BUILD_doc "build man page for xmlwf" ${BUILD_doc_default})
 option(USE_libbsd "utilize libbsd (for arc4random_buf)" OFF)
 option(INSTALL "install expat files in cmake install target" ON)
+else ()
+set(BUILD_tools OFF)
+set(BUILD_examples OFF)
+set(BUILD_tests OFF)
+set(BUILD_shared ${BUILD_SHARED_LIBS})
+set(BUILD_doc OFF)
+set(USE_libbsd OFF)
+set(INSTALL OFF)
+endif ()
 
 if(USE_libbsd)
     find_library(LIB_BSD NAMES bsd)
@@ -44,11 +54,21 @@ if(USE_libbsd)
 endif()
 
 # configuration options
+if (FALSE) # XXX(kitware): Force configuration values.
 set(XML_CONTEXT_BYTES 1024 CACHE STRING "Define to specify how much context to retain around the current parse point")
 option(XML_DTD "Define to make parameter entity parsing functionality available" ON)
 option(XML_NS "Define to make XML Namespaces functionality available" ON)
+else ()
+set(XML_CONTEXT_BYTES 1024)
+set(XML_DTD ON)
+set(XML_NS ON)
+endif ()
 if(NOT WIN32)
+    if (FALSE) # XXX(kitware): Force configuration values.
     option(XML_DEV_URANDOM "Define to include code reading entropy from `/dev/urandom'." ON)
+    else ()
+    set(XML_DEV_URANDOM ON)
+    endif ()
     if(XML_DEV_URANDOM)
         add_definitions(-DXML_DEV_URANDOM)
     endif()
@@ -71,20 +91,25 @@ endif(BUILD_tests)
 
 include(${CMAKE_CURRENT_LIST_DIR}/ConfigureChecks.cmake)
 
+if (FALSE) # XXX(kitware): This flag only works on GCC alikes. Upstream should address this.
 set(EXTRA_COMPILE_FLAGS)
 if(FLAG_NO_STRICT_ALIASING)
     set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fno-strict-aliasing")
 endif()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS}")
+endif ()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
+if (FALSE) # XXX(kitware): Settings handled by VTK.
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -wd4996)
 endif(MSVC)
 if(WIN32)
     set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a suffix, usually d on Windows")
 endif(WIN32)
+endif ()
 
 set(expat_SRCS
     lib/loadlibrary.c
@@ -98,7 +123,9 @@ set(expat_SRCS
 if(BUILD_shared)
     set(_SHARED SHARED)
     if(WIN32)
+        if (FALSE)
         set(expat_SRCS ${expat_SRCS} lib/libexpat.def)
+        endif ()
     endif(WIN32)
 else(BUILD_shared)
     set(_SHARED STATIC)
@@ -107,6 +134,7 @@ else(BUILD_shared)
     endif(WIN32)
 endif(BUILD_shared)
 
+if (FALSE) # XXX(kitware): Use VTK's build macros.
 add_library(expat ${_SHARED} ${expat_SRCS})
 if(USE_libbsd)
     target_link_libraries(expat ${LIB_BSD})
@@ -132,7 +160,27 @@ endmacro()
 expat_install(TARGETS expat RUNTIME DESTINATION bin
                       LIBRARY DESTINATION lib
                       ARCHIVE DESTINATION lib)
+else ()
+set(expat_headers
+    lib/expat.h
+    lib/expat_external.h
+    lib/vtk_expat_mangle.h)
 
+if (NOT BUILD_SHARED_LIBS)
+  set(XML_STATIC 1)
+endif ()
+
+vtk_module_add_module(vtkexpat
+  SOURCES ${expat_SRCS}
+  HEADERS ${expat_headers}
+  HEADERS_SUBDIR "vtkexpat/lib")
+target_compile_definitions(vtkexpat
+  PRIVATE
+    # Support XML files >2GB.
+    XML_LARGE_SIZE)
+endif ()
+
+if (FALSE) # XXX(kitware): Do not install a .pc file.
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}/bin")
 set(libdir "\${prefix}/lib")
@@ -141,6 +189,8 @@ configure_file(expat.pc.in ${CMAKE_CURRENT_BINARY_DIR}/expat.pc)
 
 expat_install(FILES lib/expat.h lib/expat_external.h DESTINATION include)
 expat_install(FILES ${CMAKE_CURRENT_BINARY_DIR}/expat.pc DESTINATION lib/pkgconfig)
+endif ()
+
 
 if(BUILD_tools)
     set(xmlwf_SRCS
