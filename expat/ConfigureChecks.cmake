@@ -19,6 +19,7 @@ check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 
 check_function_exists("getpagesize" HAVE_GETPAGESIZE)
+check_function_exists("getrandom" HAVE_GETRANDOM)
 check_function_exists("bcopy" HAVE_BCOPY)
 check_symbol_exists("memmove" "string.h" HAVE_MEMMOVE)
 check_function_exists("mmap" HAVE_MMAP)
