@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `arc4random_buf' function. */
 #cmakedefine HAVE_ARC4RANDOM_BUF
 
+/* XXX(kitware): VTK is fine with low entropy. */
+#define XML_POOR_ENTROPY
+
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H
 
